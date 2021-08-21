@@ -1,28 +1,34 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"os"
+	"log"
+
+	"github.com/schnell3526/auto_auto_transaction/src/app"
+	"github.com/schnell3526/auto_auto_transaction/src/config"
 )
 
-type apiKey struct {
-	API_KEY    string
-	SECRET_KEY string
+type RequestBody struct {
+	Text      string `json:"text"`
+	UserName  string `json:"username"`
+	IconEmoji string `json:"icon_emoji"`
 }
 
 func main() {
-	raw, err := ioutil.ReadFile("../.config")
+
+	// 設定ファイルの読み込み
+	log.Println("***start***")
+	log.Println("***read configuration file***")
+	config, err := config.NewConfig()
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		log.Fatalf("Configuration failed: %v", err)
 	}
+	fmt.Println(config.Dump())
 
-	var key apiKey
+	log.Println("***start aplication***")
+	if err := app.StartApp(*config); err != nil {
+		log.Fatalf("Apprication Error: %v", err)
+	}
+	log.Println("***stop aplication***")
 
-	json.Unmarshal(raw, &key)
-
-	fmt.Printf("API_KEY = %s\n", key.API_KEY)
-	fmt.Printf("SECRET_KEY = %s\n", key.SECRET_KEY)
 }
